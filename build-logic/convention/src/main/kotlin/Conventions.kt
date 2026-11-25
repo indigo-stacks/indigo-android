@@ -7,7 +7,9 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.artifacts.VersionCatalogsExtension
 import org.gradle.api.tasks.testing.Test
-import org.gradle.kotlin.dsl.*
+import org.gradle.kotlin.dsl.configure
+import org.gradle.kotlin.dsl.getByType
+import org.gradle.kotlin.dsl.withType
 import org.jetbrains.kotlin.gradle.dsl.KotlinAndroidProjectExtension
 
 private val Project.libs
@@ -61,6 +63,7 @@ class AndroidLibraryPlugin : Plugin<Project> {
             pluginManager.apply("com.android.library")
             extensions.configure<LibraryExtension> {
                 namespace = IndigoConfig.basePackage + path.replace(":", ".").replace("-", "")
+                resourcePrefix = target.name.replace("-", "_") + "_"
                 compileSdk {
                     version =
                         release(IndigoConfig.compileSdk) {

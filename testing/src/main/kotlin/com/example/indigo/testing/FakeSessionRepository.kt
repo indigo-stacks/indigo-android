@@ -1,6 +1,7 @@
 package com.example.indigo.testing
 
-import com.example.indigo.core.auth.*
+import com.example.indigo.core.auth.AuthState
+import com.example.indigo.core.auth.SessionRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 
 class FakeSessionRepository : SessionRepository {
