@@ -1,13 +1,26 @@
 package com.example.indigo.feature.auth
 
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBar
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.autofill.ContentType
 import androidx.compose.ui.focus.FocusDirection
@@ -15,33 +28,40 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentType
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.text.input.*
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardCapitalization
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.NavKey
+import com.example.indigo.components.ErrorText
+import com.example.indigo.components.IndigoTextField
+import com.example.indigo.components.IndigoTheme
+import com.example.indigo.components.PasswordField
+import com.example.indigo.components.PrimaryButton
 import kotlinx.serialization.Serializable
 
 @Serializable data object AuthRoute : NavKey
 
 @Composable
-fun AuthScreen(onBack: () -> Unit = {}, viewModel: AuthViewModel = hiltViewModel()) {
+fun AuthScreen(onBack: () -> Unit = {}, viewModel: AuthFormViewModel = hiltViewModel()) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     AuthContent(state, viewModel::send, onBack)
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AuthContent(state: AuthState, onAction: (AuthAction) -> Unit, onBack: () -> Unit = {}) {
+fun AuthContent(state: AuthFormState, onAction: (AuthFormAction) -> Unit, onBack: () -> Unit = {}) {
     val reset = state.mode == AuthMode.ForgotPassword
     BackHandler(enabled = reset && !state.isLoading) {
-        onAction(AuthAction.ModeChanged(AuthMode.SignIn))
+        onAction(AuthFormAction.ModeChanged(AuthMode.SignIn))
     }
     val focus = LocalFocusManager.current
     val submit = {
         focus.clearFocus()
-        onAction(AuthAction.Submit)
+        onAction(AuthFormAction.Submit)
     }
     Scaffold(
         topBar = {
@@ -49,21 +69,21 @@ fun AuthContent(state: AuthState, onAction: (AuthAction) -> Unit, onBack: () -> 
                 title = {
                     Text(
                         stringResource(
-                            if (reset) R.string.reset_password
-                            else if (state.mode == AuthMode.SignUp) R.string.sign_up
-                            else R.string.sign_in
+                            if (reset) R.string.auth_reset_password
+                            else if (state.mode == AuthMode.SignUp) R.string.auth_sign_up
+                            else R.string.auth_sign_in
                         )
                     )
                 },
                 navigationIcon = {
                     TextButton(
                         onClick = {
-                            if (reset) onAction(AuthAction.ModeChanged(AuthMode.SignIn))
+                            if (reset) onAction(AuthFormAction.ModeChanged(AuthMode.SignIn))
                             else onBack()
                         },
                         enabled = !state.isLoading,
                     ) {
-                        Text(stringResource(R.string.back))
+                        Text(stringResource(R.string.auth_back))
                     }
                 },
             )
@@ -82,34 +102,33 @@ fun AuthContent(state: AuthState, onAction: (AuthAction) -> Unit, onBack: () -> 
                     listOf(AuthMode.SignIn, AuthMode.SignUp).forEach { mode ->
                         FilterChip(
                             selected = state.mode == mode,
-                            onClick = { onAction(AuthAction.ModeChanged(mode)) },
+                            onClick = { onAction(AuthFormAction.ModeChanged(mode)) },
                             enabled = !state.isLoading,
                             label = {
                                 Text(
                                     stringResource(
-                                        if (mode == AuthMode.SignIn) R.string.sign_in
-                                        else R.string.sign_up
+                                        if (mode == AuthMode.SignIn) R.string.auth_sign_in
+                                        else R.string.auth_sign_up
                                     )
                                 )
                             },
                         )
                     }
                 }
-            if (state.signUpSuccess) Text(stringResource(R.string.sign_up_success))
+            if (state.signUpSuccess) Text(stringResource(R.string.auth_sign_up_success))
             if (reset && state.resetEmailSent) {
-                Text(stringResource(R.string.reset_sent))
-                Button(onClick = { onAction(AuthAction.ModeChanged(AuthMode.SignIn)) }) {
-                    Text(stringResource(R.string.done))
+                Text(stringResource(R.string.auth_reset_sent))
+                Button(onClick = { onAction(AuthFormAction.ModeChanged(AuthMode.SignIn)) }) {
+                    Text(stringResource(R.string.auth_done))
                 }
             } else {
-                if (reset) Text(stringResource(R.string.reset_help))
+                if (reset) Text(stringResource(R.string.auth_reset_help))
                 if (state.mode == AuthMode.SignUp)
-                    OutlinedTextField(
+                    IndigoTextField(
                         value = state.name,
-                        onValueChange = { onAction(AuthAction.NameChanged(it)) },
-                        label = { Text(stringResource(R.string.name)) },
+                        onValueChange = { onAction(AuthFormAction.NameChanged(it)) },
+                        label = stringResource(R.string.auth_name),
                         enabled = !state.isLoading,
-                        singleLine = true,
                         modifier = Modifier.fillMaxWidth(),
                         keyboardOptions =
                             KeyboardOptions(
@@ -119,12 +138,11 @@ fun AuthContent(state: AuthState, onAction: (AuthAction) -> Unit, onBack: () -> 
                         keyboardActions =
                             KeyboardActions(onNext = { focus.moveFocus(FocusDirection.Down) }),
                     )
-                OutlinedTextField(
+                IndigoTextField(
                     value = state.email,
-                    onValueChange = { onAction(AuthAction.EmailChanged(it)) },
-                    label = { Text(stringResource(R.string.email)) },
+                    onValueChange = { onAction(AuthFormAction.EmailChanged(it)) },
+                    label = stringResource(R.string.auth_email),
                     enabled = !state.isLoading,
-                    singleLine = true,
                     modifier =
                         Modifier.fillMaxWidth().semantics {
                             contentType = ContentType.EmailAddress
@@ -142,13 +160,11 @@ fun AuthContent(state: AuthState, onAction: (AuthAction) -> Unit, onBack: () -> 
                         ),
                 )
                 if (!reset)
-                    OutlinedTextField(
+                    PasswordField(
                         value = state.password,
-                        onValueChange = { onAction(AuthAction.PasswordChanged(it)) },
-                        label = { Text(stringResource(R.string.password)) },
+                        onValueChange = { onAction(AuthFormAction.PasswordChanged(it)) },
+                        label = stringResource(R.string.auth_password),
                         enabled = !state.isLoading,
-                        singleLine = true,
-                        visualTransformation = PasswordVisualTransformation(),
                         modifier =
                             Modifier.fillMaxWidth().semantics {
                                 contentType =
@@ -164,46 +180,43 @@ fun AuthContent(state: AuthState, onAction: (AuthAction) -> Unit, onBack: () -> 
                     )
                 if (state.mode == AuthMode.SignIn)
                     TextButton(
-                        onClick = { onAction(AuthAction.ModeChanged(AuthMode.ForgotPassword)) },
+                        onClick = { onAction(AuthFormAction.ModeChanged(AuthMode.ForgotPassword)) },
                         enabled = !state.isLoading,
                     ) {
-                        Text(stringResource(R.string.forgot_password))
+                        Text(stringResource(R.string.auth_forgot_password))
                     }
-                Button(
+                PrimaryButton(
+                    text =
+                        stringResource(
+                            if (state.isLoading) R.string.auth_working
+                            else if (reset) R.string.auth_send_reset
+                            else if (state.mode == AuthMode.SignUp) R.string.auth_sign_up
+                            else R.string.auth_sign_in
+                        ),
                     onClick = submit,
                     enabled = state.canSubmit,
+                    loading = state.isLoading,
                     modifier = Modifier.fillMaxWidth(),
-                ) {
-                    Text(
-                        stringResource(
-                            if (state.isLoading) R.string.working
-                            else if (reset) R.string.send_reset
-                            else if (state.mode == AuthMode.SignUp) R.string.sign_up
-                            else R.string.sign_in
-                        )
-                    )
-                }
-                if (state.isLoading) LinearProgressIndicator(Modifier.fillMaxWidth())
+                )
                 if (state.failed)
-                    Text(
-                        state.errorMessage ?: stringResource(R.string.generic_error),
-                        color = MaterialTheme.colorScheme.error,
-                    )
+                    ErrorText(state.errorMessage ?: stringResource(R.string.auth_generic_error))
                 if (state.unverifiedEmail != null && !state.verificationEmailSent)
                     TextButton(
-                        onClick = { onAction(AuthAction.ResendVerification) },
+                        onClick = { onAction(AuthFormAction.ResendVerification) },
                         enabled = !state.isLoading,
                     ) {
-                        Text(stringResource(R.string.resend))
+                        Text(stringResource(R.string.auth_resend))
                     }
-                if (state.verificationEmailSent) Text(stringResource(R.string.verification_sent))
+                if (state.verificationEmailSent)
+                    Text(stringResource(R.string.auth_verification_sent))
             }
         }
     }
 }
 
-@Preview
+@Preview(showBackground = true)
+@Preview(showBackground = true, uiMode = android.content.res.Configuration.UI_MODE_NIGHT_YES)
 @Composable
 private fun AuthPreview() {
-    MaterialTheme { AuthContent(AuthState(), {}) }
+    IndigoTheme(dynamicColor = false) { AuthContent(AuthFormState(), {}) }
 }

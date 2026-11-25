@@ -1,9 +1,16 @@
 package com.example.indigo.core.auth
 
-import com.example.indigo.core.network.*
+import com.example.indigo.core.network.ApiException
+import com.example.indigo.core.network.AuthApi
+import com.example.indigo.core.network.RefreshRequest
+import com.example.indigo.core.network.apiCall
 import javax.inject.Inject
 import javax.inject.Singleton
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.async
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.serialization.json.Json

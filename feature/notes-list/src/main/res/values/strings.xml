@@ -1,15 +1,15 @@
 <resources>
-    <string name="notes_title">Notes</string>
-    <string name="account">Account</string>
-    <string name="new_note">New note</string>
-    <string name="no_notes">No Notes</string>
-    <string name="no_notes_description">Tap New note to create your first note.</string>
-    <string name="delete_note">Delete note</string>
-    <string name="note_actions">Note actions</string>
-    <string name="notes_error">Could not load or delete notes. Try again.</string>
-    <string name="retry">Retry</string>
-    <string name="just_now">Just now</string>
-    <plurals name="minutes_ago"><item quantity="one">%d minute ago</item><item quantity="other">%d minutes ago</item></plurals>
-    <plurals name="hours_ago"><item quantity="one">%d hour ago</item><item quantity="other">%d hours ago</item></plurals>
-    <plurals name="days_ago"><item quantity="one">%d day ago</item><item quantity="other">%d days ago</item></plurals>
+    <string name="notes_list_notes_title">Notes</string>
+    <string name="notes_list_account">Account</string>
+    <string name="notes_list_new_note">New note</string>
+    <string name="notes_list_no_notes">No Notes</string>
+    <string name="notes_list_no_notes_description">Tap New note to create your first note.</string>
+    <string name="notes_list_delete_note">Delete note</string>
+    <string name="notes_list_note_actions">Note actions</string>
+    <string name="notes_list_notes_error">Could not load or delete notes. Try again.</string>
+    <string name="notes_list_retry">Retry</string>
+    <string name="notes_list_just_now">Just now</string>
+    <plurals name="notes_list_minutes_ago"><item quantity="one">%d minute ago</item><item quantity="other">%d minutes ago</item></plurals>
+    <plurals name="notes_list_hours_ago"><item quantity="one">%d hour ago</item><item quantity="other">%d hours ago</item></plurals>
+    <plurals name="notes_list_days_ago"><item quantity="one">%d day ago</item><item quantity="other">%d days ago</item></plurals>
 </resources>

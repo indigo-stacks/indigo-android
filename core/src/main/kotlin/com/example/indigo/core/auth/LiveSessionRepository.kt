@@ -1,6 +1,11 @@
 package com.example.indigo.core.auth
 
-import com.example.indigo.core.network.*
+import com.example.indigo.core.network.AuthApi
+import com.example.indigo.core.network.EmailRequest
+import com.example.indigo.core.network.RefreshRequest
+import com.example.indigo.core.network.ResetPasswordRequest
+import com.example.indigo.core.network.SignUpRequest
+import com.example.indigo.core.network.apiCall
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.NonCancellable

@@ -5,9 +5,10 @@ import androidx.lifecycle.viewModelScope
 import com.example.indigo.core.auth.SessionRepository
 import com.example.indigo.core.network.ApiException
 import dagger.hilt.android.lifecycle.HiltViewModel
-import java.io.IOException
 import javax.inject.Inject
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
@@ -17,7 +18,7 @@ enum class AuthMode {
     ForgotPassword,
 }
 
-data class AuthState(
+data class AuthFormState(
     val mode: AuthMode = AuthMode.SignIn,
     val name: String = "",
     val email: String = "",
@@ -38,40 +39,40 @@ data class AuthState(
                 (mode != AuthMode.SignUp || name.isNotEmpty())
 }
 
-sealed interface AuthAction {
-    data class NameChanged(val value: String) : AuthAction
+sealed interface AuthFormAction {
+    data class NameChanged(val value: String) : AuthFormAction
 
-    data class EmailChanged(val value: String) : AuthAction
+    data class EmailChanged(val value: String) : AuthFormAction
 
-    data class PasswordChanged(val value: String) : AuthAction
+    data class PasswordChanged(val value: String) : AuthFormAction
 
-    data class ModeChanged(val mode: AuthMode) : AuthAction
+    data class ModeChanged(val mode: AuthMode) : AuthFormAction
 
-    data object Submit : AuthAction
+    data object Submit : AuthFormAction
 
-    data object ResendVerification : AuthAction
+    data object ResendVerification : AuthFormAction
 }
 
 @HiltViewModel
-class AuthViewModel @Inject constructor(private val session: SessionRepository) : ViewModel() {
-    private val mutableState = MutableStateFlow(AuthState())
-    val state = mutableState.asStateFlow()
+class AuthFormViewModel @Inject constructor(private val session: SessionRepository) : ViewModel() {
+    private val mutableState = MutableStateFlow(AuthFormState())
+    val state: StateFlow<AuthFormState> = mutableState.asStateFlow()
 
-    fun send(action: AuthAction) {
+    fun send(action: AuthFormAction) {
         val current = state.value
         if (current.isLoading) return
         when (action) {
-            is AuthAction.NameChanged -> mutableState.value = current.copy(name = action.value)
-            is AuthAction.PasswordChanged ->
+            is AuthFormAction.NameChanged -> mutableState.value = current.copy(name = action.value)
+            is AuthFormAction.PasswordChanged ->
                 mutableState.value = current.copy(password = action.value)
-            is AuthAction.EmailChanged ->
+            is AuthFormAction.EmailChanged ->
                 mutableState.value =
                     current.copy(
                         email = action.value,
                         unverifiedEmail = null,
                         verificationEmailSent = false,
                     )
-            is AuthAction.ModeChanged ->
+            is AuthFormAction.ModeChanged ->
                 mutableState.value =
                     current.copy(
                         mode = action.mode,
@@ -82,14 +83,14 @@ class AuthViewModel @Inject constructor(private val session: SessionRepository) 
                         verificationEmailSent = false,
                         resetEmailSent = false,
                     )
-            AuthAction.Submit -> if (current.canSubmit) request(current, false)
-            AuthAction.ResendVerification ->
+            AuthFormAction.Submit -> if (current.canSubmit) request(current, false)
+            AuthFormAction.ResendVerification ->
                 if (current.unverifiedEmail != null && !current.verificationEmailSent)
                     request(current, true)
         }
     }
 
-    private fun request(submitted: AuthState, resend: Boolean) {
+    private fun request(submitted: AuthFormState, resend: Boolean) {
         mutableState.value =
             submitted.copy(
                 isLoading = true,
@@ -123,7 +124,8 @@ class AuthViewModel @Inject constructor(private val session: SessionRepository) 
                             current.copy(isLoading = false, resetEmailSent = true)
                         else -> current.copy(isLoading = false)
                     }
-            } catch (error: IOException) {
+            } catch (error: Exception) {
+                if (error is CancellationException) throw error
                 val api = error as? ApiException
                 mutableState.value =
                     state.value.copy(

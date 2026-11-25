@@ -3,11 +3,18 @@ package com.example.indigo.feature.account
 import com.example.indigo.core.auth.AuthState
 import com.example.indigo.core.network.ApiErrorBody
 import com.example.indigo.core.network.ApiException
-import com.example.indigo.testing.*
+import com.example.indigo.testing.FakeAccountRepository
+import com.example.indigo.testing.FakeSessionRepository
+import com.example.indigo.testing.MainDispatcherRule
 import java.io.IOException
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.*
-import org.junit.Assert.*
+import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.runCurrent
+import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 

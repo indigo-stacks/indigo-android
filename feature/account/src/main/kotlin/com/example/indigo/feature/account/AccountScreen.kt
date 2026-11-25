@@ -1,10 +1,21 @@
 package com.example.indigo.feature.account
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBar
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
@@ -14,6 +25,9 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.NavKey
+import com.example.indigo.components.ErrorText
+import com.example.indigo.components.IndigoTheme
+import com.example.indigo.components.PrimaryButton
 import kotlinx.serialization.Serializable
 
 @Serializable data object AccountRoute : NavKey
@@ -34,9 +48,9 @@ fun AccountContent(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(stringResource(R.string.account)) },
+                title = { Text(stringResource(R.string.account_account)) },
                 navigationIcon = {
-                    TextButton(onClick = onBack) { Text(stringResource(R.string.done)) }
+                    TextButton(onClick = onBack) { Text(stringResource(R.string.account_done)) }
                 },
             )
         }
@@ -49,58 +63,60 @@ fun AccountContent(
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             if (state.isLoading || state.isSigningOut) {
-                val description = stringResource(R.string.loading)
+                val description = stringResource(R.string.account_loading)
                 LinearProgressIndicator(
                     Modifier.fillMaxWidth().semantics { contentDescription = description }
                 )
             }
             state.profile?.let { profile ->
-                Text(stringResource(R.string.name, profile.name))
-                Text(stringResource(R.string.email, profile.email))
+                Text(stringResource(R.string.account_name, profile.name))
+                Text(stringResource(R.string.account_email, profile.email))
                 Text(
                     stringResource(
-                        R.string.verified,
-                        stringResource(if (profile.emailVerified) R.string.yes else R.string.no),
+                        R.string.account_verified,
+                        stringResource(
+                            if (profile.emailVerified) R.string.account_yes else R.string.account_no
+                        ),
                     )
                 )
             }
             if (state.failed) {
-                Text(
-                    state.errorMessage ?: stringResource(R.string.generic_error),
-                    color = MaterialTheme.colorScheme.error,
-                )
+                ErrorText(state.errorMessage ?: stringResource(R.string.account_generic_error))
                 TextButton(
                     onClick = { onAction(AccountAction.Retry) },
                     enabled = !state.isLoading && !state.isSigningOut,
                 ) {
-                    Text(stringResource(R.string.retry))
+                    Text(stringResource(R.string.account_retry))
                 }
             }
-            Button(onClick = { onAction(AccountAction.SignOut) }, enabled = !state.isSigningOut) {
-                Text(stringResource(R.string.sign_out))
-            }
+            PrimaryButton(
+                stringResource(R.string.account_sign_out),
+                { onAction(AccountAction.SignOut) },
+                enabled = !state.isSigningOut,
+            )
         }
     }
     if (state.confirmSignOut)
         AlertDialog(
             onDismissRequest = { onAction(AccountAction.CancelSignOut) },
-            title = { Text(stringResource(R.string.sign_out_title)) },
-            text = { Text(stringResource(R.string.sign_out_warning)) },
+            title = { Text(stringResource(R.string.account_sign_out_title)) },
+            text = { Text(stringResource(R.string.account_sign_out_warning)) },
             confirmButton = {
                 TextButton(onClick = { onAction(AccountAction.ConfirmSignOut) }) {
-                    Text(stringResource(R.string.sign_out))
+                    Text(stringResource(R.string.account_sign_out))
                 }
             },
             dismissButton = {
                 TextButton(onClick = { onAction(AccountAction.CancelSignOut) }) {
-                    Text(stringResource(R.string.cancel))
+                    Text(stringResource(R.string.account_cancel))
                 }
             },
         )
 }
 
-@Preview
+@Preview(showBackground = true)
+@Preview(showBackground = true, uiMode = android.content.res.Configuration.UI_MODE_NIGHT_YES)
 @Composable
 private fun AccountPreview() {
-    MaterialTheme { AccountContent(AccountState(isLoading = true), {}) }
+    IndigoTheme(dynamicColor = false) { AccountContent(AccountState(isLoading = true), {}) }
 }

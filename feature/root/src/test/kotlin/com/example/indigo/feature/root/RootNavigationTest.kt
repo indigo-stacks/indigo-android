@@ -4,7 +4,10 @@ import com.example.indigo.core.auth.AuthState
 import com.example.indigo.feature.account.AccountRoute
 import com.example.indigo.feature.auth.AuthRoute
 import com.example.indigo.feature.noteslist.NotesListRoute
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class RootNavigationTest {

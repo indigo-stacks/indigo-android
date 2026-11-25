@@ -8,7 +8,13 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import java.util.UUID
 import javax.inject.Inject
 import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 data class NotesListState(
@@ -40,8 +46,7 @@ class NotesListViewModel @Inject constructor(private val repository: NotesReposi
         observation?.cancel()
         observation = viewModelScope.launch {
             mutableState.update { it.copy(isLoading = true, hasError = false) }
-            repository
-                .observeNotes()
+            flow { emitAll(repository.observeNotes()) }
                 .catch { error ->
                     if (error is CancellationException) throw error
                     mutableState.update { it.copy(isLoading = false, hasError = true) }

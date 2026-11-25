@@ -11,7 +11,9 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 
@@ -38,6 +40,19 @@ class NotesListViewModelTest {
             viewModel.send(NotesListAction.Delete(first.id))
             assertEquals(listOf(second), awaitItem().notes)
         }
+    }
+
+    @Test
+    fun `repository failure before a flow is returned shows an error`() = runTest {
+        val repository =
+            object : NotesRepository by FakeNotesRepository() {
+                override fun observeNotes(): kotlinx.coroutines.flow.Flow<List<Note>> =
+                    throw IllegalStateException("Cannot open cache")
+            }
+        val viewModel = NotesListViewModel(repository)
+        runCurrent()
+        assertTrue(viewModel.state.value.hasError)
+        assertFalse(viewModel.state.value.isLoading)
     }
 
     @Test

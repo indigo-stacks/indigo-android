@@ -7,9 +7,10 @@ import com.example.indigo.core.account.UserProfile
 import com.example.indigo.core.auth.SessionRepository
 import com.example.indigo.core.network.ApiException
 import dagger.hilt.android.lifecycle.HiltViewModel
-import java.io.IOException
 import javax.inject.Inject
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
@@ -38,7 +39,7 @@ class AccountViewModel
 constructor(private val account: AccountRepository, private val session: SessionRepository) :
     ViewModel() {
     private val mutableState = MutableStateFlow(AccountState())
-    val state = mutableState.asStateFlow()
+    val state: StateFlow<AccountState> = mutableState.asStateFlow()
 
     init {
         load()
@@ -64,7 +65,8 @@ constructor(private val account: AccountRepository, private val session: Session
                         try {
                             session.signOut()
                             mutableState.value = state.value.copy(isSigningOut = false)
-                        } catch (error: IOException) {
+                        } catch (error: Exception) {
+                            if (error is CancellationException) throw error
                             fail(error, signingOut = true)
                         }
                     }
@@ -78,13 +80,14 @@ constructor(private val account: AccountRepository, private val session: Session
             try {
                 val profile = account.profile()
                 mutableState.value = state.value.copy(profile = profile, isLoading = false)
-            } catch (error: IOException) {
+            } catch (error: Exception) {
+                if (error is CancellationException) throw error
                 fail(error)
             }
         }
     }
 
-    private fun fail(error: IOException, signingOut: Boolean = false) {
+    private fun fail(error: Exception, signingOut: Boolean = false) {
         // Profile and sign-out requests can overlap; neither completion owns the other's gate.
         mutableState.value =
             state.value.copy(

@@ -1,6 +1,7 @@
 package com.example.indigo.testing
 
-import com.example.indigo.core.account.*
+import com.example.indigo.core.account.AccountRepository
+import com.example.indigo.core.account.UserProfile
 
 class FakeAccountRepository : AccountRepository {
     var onProfile: suspend () -> UserProfile = {

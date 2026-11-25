@@ -3,7 +3,8 @@ package com.example.indigo.core
 import com.example.indigo.core.network.ApiErrorBody
 import com.example.indigo.core.network.ApiException
 import kotlinx.serialization.json.Json
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Test
 
 class ApiErrorBodyTest {

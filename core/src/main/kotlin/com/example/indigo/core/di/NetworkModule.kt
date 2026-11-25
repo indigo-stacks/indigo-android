@@ -3,8 +3,12 @@ package com.example.indigo.core.di
 import android.content.Context
 import com.chuckerteam.chucker.api.ChuckerInterceptor
 import com.example.indigo.core.BuildConfig
-import com.example.indigo.core.account.*
-import com.example.indigo.core.network.*
+import com.example.indigo.core.account.AccountApi
+import com.example.indigo.core.account.AccountRepository
+import com.example.indigo.core.account.LiveAccountRepository
+import com.example.indigo.core.network.AuthApi
+import com.example.indigo.core.network.BearerInterceptor
+import com.example.indigo.core.network.TokenAuthenticator
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
