@@ -1,0 +1,1 @@
+<resources><style name="Theme.Indigo" parent="android:style/Theme.Material.Light.NoActionBar"><item name="android:fontFamily">sans</item><item name="android:windowLightStatusBar">false</item></style><color name="launcher_background">#4F46A5</color></resources>
