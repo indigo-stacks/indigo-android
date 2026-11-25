@@ -1,1 +1,13 @@
-<resources><string name="placeholder_title">Sign in</string></resources>
+<resources>
+    <string name="sign_in">Sign In</string><string name="sign_up">Sign Up</string>
+    <string name="name">Name</string><string name="email">Email</string><string name="password">Password</string>
+    <string name="forgot_password">Forgot password?</string><string name="reset_password">Reset Password</string>
+    <string name="send_reset">Send Reset Link</string><string name="back">Back</string><string name="done">Done</string>
+    <string name="reset_help">Enter the email you signed up with and we\'ll send you a link to reset your password.</string>
+    <string name="reset_sent">Check your email for a reset link.</string>
+    <string name="sign_up_success">Account created. Check your email to verify it, then sign in.</string>
+    <string name="verification_sent">Verification email sent. Check your inbox, then sign in.</string>
+    <string name="resend">Resend verification email</string>
+    <string name="generic_error">Something went wrong. Please try again.</string>
+    <string name="working">Please wait</string>
+</resources>
