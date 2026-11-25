@@ -1,1 +1,10 @@
-<resources><string name="placeholder_title">Account</string></resources>
+<resources>
+    <string name="account">Account</string><string name="done">Done</string>
+    <string name="name">Name: %1$s</string><string name="email">Email: %1$s</string>
+    <string name="verified">Email verified: %1$s</string><string name="yes">Yes</string><string name="no">No</string>
+    <string name="retry">Retry</string><string name="sign_out">Sign Out</string>
+    <string name="sign_out_title">Sign Out?</string><string name="cancel">Cancel</string>
+    <string name="sign_out_warning">Signing out (or switching accounts) wipes this account\'s cached notes from the device.</string>
+    <string name="generic_error">Something went wrong. Please try again.</string>
+    <string name="loading">Loading account</string>
+</resources>
