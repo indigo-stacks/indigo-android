@@ -1,7 +1,6 @@
 package com.example.indigo.core.di
 
-import com.example.indigo.core.auth.PlaceholderSessionRepository
-import com.example.indigo.core.auth.SessionRepository
+import com.example.indigo.core.auth.*
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -13,7 +12,7 @@ import javax.inject.Singleton
 abstract class AuthModule {
     @Binds
     @Singleton
-    abstract fun bindSessionRepository(
-        implementation: PlaceholderSessionRepository
-    ): SessionRepository
+    abstract fun bindSessionRepository(implementation: LiveSessionRepository): SessionRepository
+
+    @Binds @Singleton abstract fun bindTokenStore(implementation: EncryptedTokenStore): TokenStore
 }
