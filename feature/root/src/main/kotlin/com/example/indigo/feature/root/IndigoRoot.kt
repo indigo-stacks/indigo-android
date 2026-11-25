@@ -11,10 +11,7 @@ import com.example.indigo.feature.account.AccountRoute
 import com.example.indigo.feature.account.AccountScreen
 import com.example.indigo.feature.auth.AuthRoute
 import com.example.indigo.feature.auth.AuthScreen
-import com.example.indigo.feature.noteeditor.NoteEditorRoute
-import com.example.indigo.feature.noteeditor.NoteEditorScreen
 import com.example.indigo.feature.noteslist.NotesListRoute
-import com.example.indigo.feature.noteslist.NotesListScreen
 
 @Composable
 fun IndigoRoot() {
@@ -25,10 +22,9 @@ fun IndigoRoot() {
             onBack = { backStack.removeLastOrNull() },
             entryProvider =
                 entryProvider {
-                    entry<NotesListRoute> { NotesListScreen() }
+                    notesEntries(backStack, onAccountClick = {})
                     entry<AuthRoute> { AuthScreen() }
                     entry<AccountRoute> { AccountScreen() }
-                    entry<NoteEditorRoute> { NoteEditorScreen() }
                 },
         )
     }
