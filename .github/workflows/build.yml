@@ -15,8 +15,10 @@ jobs:
           java-version: |
             21
             25
-      - uses: android-actions/setup-android@v3
-      - name: Install SDK
-        run: sdkmanager 'platforms;android-37.1' 'build-tools;37.0.0'
+      # The runner image ships an Android SDK; add only what this build needs.
+      - name: Install SDK packages
+        run: |
+          sdkmanager=$(ls -d "$ANDROID_HOME"/cmdline-tools/*/bin/sdkmanager | sort -V | tail -1)
+          "$sdkmanager" --install 'platforms;android-37.1' 'build-tools;37.0.0'
       - uses: gradle/actions/setup-gradle@v4
       - run: ./gradlew build
